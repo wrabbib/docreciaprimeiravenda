@@ -6,6 +6,8 @@ import Checklist from "@/components/Checklist";
 import Quiz, { type Pergunta } from "@/components/Quiz";
 import Concluir from "@/components/Concluir";
 
+type Material = { titulo: string; descricao?: string; arquivo: string; tipo?: string };
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { supabase } = await perfilAtual();
@@ -19,7 +21,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
 
   const { data: aula } = await supabase
     .from("aulas")
-    .select("id, slug, numero, titulo, minutos, situacao, essencial, desfecho, pratica, missao, modulo_id, ordem, modulos(titulo, ordem)")
+    .select("id, slug, numero, titulo, minutos, situacao, essencial, desfecho, pratica, missao, materiais, modulo_id, ordem, modulos(titulo, ordem)")
     .eq("slug", slug)
     .single();
   if (!aula) notFound();
@@ -33,6 +35,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
 
   const modulo = aula.modulos as unknown as { titulo: string; ordem: number } | null;
   const pratica = (aula.pratica as string[]) ?? [];
+  const materiais = (aula.materiais as Material[]) ?? [];
   const proxima = proximas?.[0] ?? null;
 
   return (
@@ -78,6 +81,26 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
         <section className="bloco">
           <h2>Na prática</h2>
           <Checklist aulaId={aula.id} itens={pratica} marcadosIniciais={(prog?.checklist as number[]) ?? []} />
+        </section>
+      )}
+
+      {materiais.length > 0 && (
+        <section className="bloco">
+          <h2>Material de apoio</h2>
+          <div className="materiais">
+            {materiais.map((m) => (
+              <a key={m.arquivo} href={m.arquivo} className="material" target="_blank" rel="noopener">
+                <span className="material-icone" aria-hidden="true">
+                  {m.tipo ?? "PDF"}
+                </span>
+                <span className="material-texto">
+                  <b>{m.titulo}</b>
+                  {m.descricao && <span>{m.descricao}</span>}
+                </span>
+                <span className="material-acao">Abrir</span>
+              </a>
+            ))}
+          </div>
         </section>
       )}
 

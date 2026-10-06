@@ -338,6 +338,37 @@ h1, h2, h3 { font-family: var(--ui); line-height: 1.15; margin: 0; }
 .checklist input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--selo); flex: none; }
 .checklist input:checked + span { color: var(--tinta-fraca); text-decoration: line-through; }
 
+/* Material de apoio */
+.materiais { display: grid; gap: 8px; }
+.material {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--superficie);
+  border: 1.5px solid var(--linha);
+  border-radius: var(--raio);
+  text-decoration: none;
+}
+.material:hover { border-color: var(--tinta); }
+.material-icone {
+  flex: none;
+  width: 44px;
+  height: 52px;
+  border-radius: 6px;
+  background: var(--tinta);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: .02em;
+}
+.material-texto { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.material-texto b { font-size: 16px; }
+.material-texto span { font-size: 14px; color: var(--tinta-suave); }
+.material-acao { font-weight: 700; color: var(--selo); font-size: 14px; }
+
 /* Teste rápido */
 .quiz { background: var(--superficie); border: 1.5px solid var(--linha); border-radius: var(--raio); padding: 22px 20px; }
 .quiz-topo { display: flex; justify-content: space-between; font-size: 14px; color: var(--tinta-fraca); font-weight: 600; }
