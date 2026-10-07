@@ -17,7 +17,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function AulaPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { supabase, user } = await perfilAtual();
+  const { supabase, user, perfil } = await perfilAtual();
+  const caminho = perfil?.caminho ?? null;
 
   const { data: aula } = await supabase
     .from("aulas")
@@ -26,17 +27,25 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
     .single();
   if (!aula) notFound();
 
-  const [{ data: perguntas }, { data: prog }, { data: cards }, { data: proximas }] = await Promise.all([
+  const [{ data: perguntas }, { data: prog }, { data: cards }, { data: todas }] = await Promise.all([
     supabase.from("quiz_perguntas").select("id, pergunta, opcoes, correta, explicacao").eq("aula_id", aula.id).order("ordem"),
     supabase.from("progresso").select("concluida_em, checklist, acertos").eq("aula_id", aula.id).eq("user_id", user.id).maybeSingle(),
     supabase.from("cards").select("slug, titulo, categoria, resumo").eq("aula_id", aula.id).order("titulo"),
-    supabase.from("aulas").select("slug, numero, titulo").eq("modulo_id", aula.modulo_id).gt("ordem", aula.ordem).order("ordem").limit(1),
+    supabase.from("aulas").select("slug, numero, titulo, ordem, caminho, modulos(ordem)"),
   ]);
 
   const modulo = aula.modulos as unknown as { titulo: string; ordem: number } | null;
   const pratica = (aula.pratica as string[]) ?? [];
   const materiais = (aula.materiais as Material[]) ?? [];
-  const proxima = proximas?.[0] ?? null;
+
+  // próxima aula do caminho do aluno, seguindo para o próximo módulo quando este acabar
+  type Item = { slug: string; numero: string; titulo: string; ordem: number; caminho: string; modulos: { ordem: number } | null };
+  const sequencia = ((todas ?? []) as unknown as Item[])
+    .filter((a) => a.caminho === "ambos" || !caminho || a.caminho === caminho)
+    .sort((a, b) => (a.modulos?.ordem ?? 0) - (b.modulos?.ordem ?? 0) || a.ordem - b.ordem);
+  const posicao = sequencia.findIndex((a) => a.slug === aula.slug);
+  const seguinte = posicao >= 0 ? sequencia[posicao + 1] : undefined;
+  const proxima = seguinte ? { slug: seguinte.slug, numero: seguinte.numero, titulo: seguinte.titulo } : null;
 
   return (
     <article className="pagina">
