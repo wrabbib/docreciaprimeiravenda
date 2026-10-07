@@ -71,10 +71,10 @@ export default function Login() {
     <div className="login-wrap">
       <section className="login-lado">
         <h1 className="grande">
-          Tirei o CRECI.
-          <span className="seta">E agora?</span>
+          Do CRECI
+          <span className="seta">à primeira venda</span>
         </h1>
-        <p>O guia com tudo que o corretor precisa saber: direitos, deveres, documentos, comissão e cada etapa da venda.</p>
+        <p>O guia do corretor de imóveis: tudo que você precisa saber, de direitos e deveres a documentos, comissão e cada etapa da venda.</p>
       </section>
       <form className="login-form" onSubmit={entrar}>
         <h2 className="titulo-pagina" style={{ fontSize: 28 }}>Entrar</h2>
